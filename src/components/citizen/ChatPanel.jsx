@@ -5,10 +5,12 @@ import AgentChain from '@/components/logic/AgentChain';
 import WasteActions from './WasteActions';
 
 export default function ChatPanel({ messages, isTyping, activeStep, completedSteps, options, onOption, isSimulating, isLocked }) {
-  const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
   }, [messages, isTyping, options]);
 
   return (
@@ -16,14 +18,16 @@ export default function ChatPanel({ messages, isTyping, activeStep, completedSte
       <AgentChain activeStep={activeStep} completedSteps={completedSteps} />
 
       {/* WhatsApp-style chat background */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin
-        bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAwIDBMMjAwIDIwMEwwIDIwMEwwIDBNMCA0MDBMMjAwIDQwMEwyMDAgMjAwIEwwIDIwMCB6IE0yMDAgMjAwIEw0MDAgMjAwIEw0MDAgNDAwIEwyMDAgNDAwIHogTTQwMCAwIEwyMDAgMCBMMjAwIDIwMCBMNDAwIDIwMCB6IiBmaWxsPSIjZjBmMGYwIiBmaWxsLW9wYWNpdHk9IjAuNCIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+')] bg-[length:80px_80px]">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto scrollbar-thin
+        bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAwIDBMMjAwIDIwMEwwIDIwMEwwIDBNMCA0MDBMMjAwIDQwMEwyMDAgMjAwIEwwIDIwMCB6IE0yMDAgMjAwIEw0MDAgMjAwIEw0MDAgNDAwIEwyMDAgNDAwIHogTTQwMCAwIEwyMDAgMCBMMjAwIDIwMCBMNDAwIDIwMCB6IiBmaWxsPSIjZjBmMGYwIiBmaWxsLW9wYWNpdHk9IjAuNCIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+')] bg-[length:80px_80px]"
+      >
         <div className="px-4 py-3 space-y-2">
           {messages.map((msg) => (
             <ChatMessage key={msg.id || msg.timestamp} message={msg} />
           ))}
           {isTyping && <TypingIndicator />}
-          <div ref={bottomRef} />
         </div>
       </div>
 
