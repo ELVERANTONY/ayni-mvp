@@ -6,8 +6,6 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminView from '@/components/admin/AdminView';
 import AdminContributors from '@/components/admin/AdminContributors';
 import AdminRequests from '@/components/admin/AdminRequests';
-import AdminRegistrations from '@/components/admin/AdminRegistrations';
-import AdminSettings from '@/components/admin/AdminSettings';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -76,28 +74,7 @@ export default function AdminDashboard() {
             <AdminRequests />
           </div>
         )}
-        {activeTab === 'registrations' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold tracking-tight dark:text-white text-slate-900">Inscripciones al Programa</h1>
-              <p className="text-sm mt-1 dark:text-slate-500 text-slate-400">
-                Aprobación de nuevos ciudadanos en la plataforma AYNI
-              </p>
-            </div>
-            <AdminRegistrations />
-          </div>
-        )}
-        {activeTab === 'settings' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold tracking-tight dark:text-white text-slate-900">Configuración</h1>
-              <p className="text-sm mt-1 dark:text-slate-500 text-slate-400">
-                Ajustes generales del sistema y la base de datos
-              </p>
-            </div>
-            <AdminSettings />
-          </div>
-        )}
+
       </main>
     </div>
   );
