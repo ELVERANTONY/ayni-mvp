@@ -6,8 +6,8 @@ import { login } from '@/store/authStore';
 export default function Login() {
   const navigate = useNavigate();
   const [accessType, setAccessType] = useState('citizen');
-  const [identifier, setIdentifier] = useState('');
-  const [secret, setSecret] = useState('');
+  const [identifier, setIdentifier] = useState('71234567');
+  const [secret, setSecret] = useState('123456');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -56,7 +56,7 @@ export default function Login() {
         <div className="grid grid-cols-2 gap-2 mb-6 p-1 rounded-xl dark:bg-slate-800/60 bg-slate-100">
           <button
             type="button"
-            onClick={() => { setAccessType('citizen'); setIdentifier(''); setSecret(''); setError(null); }}
+            onClick={() => { setAccessType('citizen'); setIdentifier('71234567'); setSecret('123456'); setError(null); }}
             className={`py-2 rounded-lg text-xs font-semibold transition-colors ${accessType === 'citizen' ? 'bg-white dark:bg-slate-700 dark:text-white text-ayni-700 shadow-sm' : 'dark:text-slate-400 text-slate-500'}`}
           >
             Ciudadano
@@ -80,7 +80,8 @@ export default function Login() {
                 inputMode={accessType === 'citizen' ? 'numeric' : 'email'}
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder={accessType === 'citizen' ? 'DNI de 8 dígitos' : 'admin@ayni.pe'}
+                maxLength={accessType === 'citizen' ? 8 : undefined}
+                placeholder={accessType === 'citizen' ? '71234567' : 'admin@ayni.pe'}
                 className="w-full px-4 py-3 rounded-xl text-sm transition-all duration-200
                   dark:bg-slate-800/60 dark:border-slate-700/30 dark:text-white dark:placeholder-slate-500
                   bg-white border-slate-200/50 text-slate-900 placeholder-slate-400
@@ -98,7 +99,8 @@ export default function Login() {
                   inputMode={accessType === 'citizen' ? 'numeric' : undefined}
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
-                  placeholder={accessType === 'citizen' ? 'Código de 6 dígitos' : '••••••••'}
+                  maxLength={accessType === 'citizen' ? 6 : undefined}
+                  placeholder={accessType === 'citizen' ? '123456' : '••••••••'}
                   className="w-full px-4 py-3 rounded-xl text-sm transition-all duration-200 pr-11
                     dark:bg-slate-800/60 dark:border-slate-700/30 dark:text-white dark:placeholder-slate-500
                     bg-white border-slate-200/50 text-slate-900 placeholder-slate-400
@@ -148,7 +150,7 @@ export default function Login() {
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <div className="dark:bg-slate-800/40 bg-slate-100 rounded-xl p-3">
                 <span className="font-semibold dark:text-slate-300 text-slate-600 block">Ciudadano</span>
-                <span className="dark:text-slate-500 text-slate-400">Cualquier DNI válido</span>
+                <span className="dark:text-slate-500 text-slate-400">DNI: 71234567</span>
                 <span className="dark:text-slate-500 text-slate-400 block">Código: 123456</span>
               </div>
               <div className="dark:bg-slate-800/40 bg-slate-100 rounded-xl p-3">

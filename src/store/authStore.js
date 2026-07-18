@@ -2,7 +2,7 @@ import db from '@/services/db';
 
 const CREDENTIALS = {
   admin: { email: 'admin@ayni.pe', password: 'admin123', role: 'admin', name: 'Administrador Municipal' },
-  citizen: { role: 'citizen', name: 'Ciudadano Demo', otp: '123456' },
+  citizen: { document: '71234567', role: 'citizen', name: 'Ciudadano Demo - AYNI-00001', otp: '123456' },
 };
 
 const sessionKey = (role) => `session-${role}`;
@@ -13,8 +13,8 @@ export async function login(identifier, secret, accessType = 'citizen') {
   const isCitizenAccess = accessType === 'citizen';
   const document = identifier.replace(/\D/g, '');
   const user = isCitizenAccess
-    ? (document.length === 8 && secret === CREDENTIALS.citizen.otp
-      ? { ...CREDENTIALS.citizen, document, email: `dni-${document}@ayni.demo` }
+    ? (document === CREDENTIALS.citizen.document && secret === CREDENTIALS.citizen.otp
+      ? { ...CREDENTIALS.citizen, email: `dni-${document}@ayni.demo` }
       : null)
     : (identifier.toLowerCase() === CREDENTIALS.admin.email && secret === CREDENTIALS.admin.password
       ? CREDENTIALS.admin
@@ -22,7 +22,7 @@ export async function login(identifier, secret, accessType = 'citizen') {
 
   if (!user) {
     throw new Error(isCitizenAccess
-      ? 'Ingresa un DNI válido de 8 dígitos y el código de acceso correcto.'
+      ? 'Usa el DNI y código de acceso de la cuenta demo AYNI-00001.'
       : 'Credenciales inválidas. Verifica tu correo y contraseña.');
   }
 
