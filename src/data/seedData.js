@@ -16,6 +16,12 @@ export const INITIAL_MESSAGES = [
   },
 ];
 
+export const INITIAL_WASTE_LOGS = [
+  { wasteType: 'Botella PET', kg: 1.2, co2: 0.12, scenario: 'approved', timestamp: Date.now() - 2 * 60 * 60 * 1000 },
+  { wasteType: 'Caja de Cartón', kg: 3.5, co2: 0.47, scenario: 'approved', timestamp: Date.now() - 26 * 60 * 60 * 1000 },
+  { wasteType: 'Lata de Aluminio', kg: 0.8, co2: 0.16, scenario: 'approved', timestamp: Date.now() - 5 * 24 * 60 * 60 * 1000 },
+];
+
 export const INITIAL_CONTRIBUTORS = [
   { name: 'María Rodríguez', code: '45892-A', level: 'Constante', discount: 15, signed: false, blocked: false, blockReason: '' },
   { name: 'Juan Pérez', code: '47123-B', level: 'Constante', discount: 15, signed: true, blocked: false, blockReason: '' },
@@ -69,6 +75,11 @@ export async function seedDatabase() {
   const msgCount = await db.messages.count();
   if (msgCount === 0) {
     await db.messages.bulkAdd(INITIAL_MESSAGES);
+  }
+
+  const wasteLogCount = await db.wasteLog.count();
+  if (wasteLogCount === 0) {
+    await db.wasteLog.bulkAdd(INITIAL_WASTE_LOGS);
   }
 
   const contribCount = await db.contributors.count();
