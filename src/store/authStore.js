@@ -2,24 +2,33 @@ import db from '@/services/db';
 
 const CREDENTIALS = {
   admin: { email: 'admin@ayni.pe', password: 'admin123', role: 'admin', name: 'Administrador Municipal' },
-  citizen: { email: 'user@ayni.pe', password: 'user123', role: 'citizen', name: 'Ciudadano' },
+  citizen: { role: 'citizen', name: 'Ciudadano Demo', otp: '123456' },
 };
 
 const sessionKey = (role) => `session-${role}`;
 
-export async function login(email, password) {
+export async function login(identifier, secret, accessType = 'citizen') {
   await new Promise((r) => setTimeout(r, 800 + Math.random() * 600));
 
-  const user = Object.values(CREDENTIALS).find(
-    (u) => u.email === email.toLowerCase() && u.password === password
-  );
+  const isCitizenAccess = accessType === 'citizen';
+  const document = identifier.replace(/\D/g, '');
+  const user = isCitizenAccess
+    ? (document.length === 8 && secret === CREDENTIALS.citizen.otp
+      ? { ...CREDENTIALS.citizen, document, email: `dni-${document}@ayni.demo` }
+      : null)
+    : (identifier.toLowerCase() === CREDENTIALS.admin.email && secret === CREDENTIALS.admin.password
+      ? CREDENTIALS.admin
+      : null);
 
   if (!user) {
-    throw new Error('Credenciales inválidas. Verifica tu correo y contraseña.');
+    throw new Error(isCitizenAccess
+      ? 'Ingresa un DNI válido de 8 dígitos y el código de acceso correcto.'
+      : 'Credenciales inválidas. Verifica tu correo y contraseña.');
   }
 
   const session = {
     email: user.email,
+    document: user.document || null,
     role: user.role,
     name: user.name,
     loggedAt: Date.now(),

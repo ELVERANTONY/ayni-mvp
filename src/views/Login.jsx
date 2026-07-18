@@ -5,15 +5,16 @@ import { login } from '@/store/authStore';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [accessType, setAccessType] = useState('citizen');
+  const [identifier, setIdentifier] = useState('');
+  const [secret, setSecret] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!identifier || !secret) {
       setError('Completa todos los campos.');
       return;
     }
@@ -21,7 +22,7 @@ export default function Login() {
     setError(null);
 
     try {
-      const session = await login(email, password);
+      const session = await login(identifier, secret, accessType);
       navigate(session.role === 'admin' ? '/admin' : '/citizen');
     } catch (err) {
       setError(err.message);
@@ -46,18 +47,40 @@ export default function Login() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ayni-400 to-ayni-600 flex items-center justify-center mx-auto mb-4 shadow-glow">
               <Recycle className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold dark:text-white text-slate-900">Acceder al Sistema</h1>
-            <p className="text-sm mt-1 dark:text-slate-400 text-slate-500">Ingresa tus credenciales para continuar</p>
-          </div>
+          <h1 className="text-2xl font-bold dark:text-white text-slate-900">Acceder al Sistema</h1>
+          <p className="text-sm mt-1 dark:text-slate-400 text-slate-500">
+            {accessType === 'citizen' ? 'Ingresa con tu DNI y código de acceso' : 'Acceso institucional municipal'}
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium dark:text-slate-300 text-slate-700 mb-1.5">Correo electrónico</label>
+        <div className="grid grid-cols-2 gap-2 mb-6 p-1 rounded-xl dark:bg-slate-800/60 bg-slate-100">
+          <button
+            type="button"
+            onClick={() => { setAccessType('citizen'); setIdentifier(''); setSecret(''); setError(null); }}
+            className={`py-2 rounded-lg text-xs font-semibold transition-colors ${accessType === 'citizen' ? 'bg-white dark:bg-slate-700 dark:text-white text-ayni-700 shadow-sm' : 'dark:text-slate-400 text-slate-500'}`}
+          >
+            Ciudadano
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAccessType('admin'); setIdentifier(''); setSecret(''); setError(null); }}
+            className={`py-2 rounded-lg text-xs font-semibold transition-colors ${accessType === 'admin' ? 'bg-white dark:bg-slate-700 dark:text-white text-blue-700 shadow-sm' : 'dark:text-slate-400 text-slate-500'}`}
+          >
+            Administrador
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+              <label className="block text-sm font-medium dark:text-slate-300 text-slate-700 mb-1.5">
+                {accessType === 'citizen' ? 'DNI' : 'Correo institucional'}
+              </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@ayni.pe"
+                type={accessType === 'citizen' ? 'text' : 'email'}
+                inputMode={accessType === 'citizen' ? 'numeric' : 'email'}
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={accessType === 'citizen' ? 'DNI de 8 dígitos' : 'admin@ayni.pe'}
                 className="w-full px-4 py-3 rounded-xl text-sm transition-all duration-200
                   dark:bg-slate-800/60 dark:border-slate-700/30 dark:text-white dark:placeholder-slate-500
                   bg-white border-slate-200/50 text-slate-900 placeholder-slate-400
@@ -66,13 +89,16 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark:text-slate-300 text-slate-700 mb-1.5">Contraseña</label>
+              <label className="block text-sm font-medium dark:text-slate-300 text-slate-700 mb-1.5">
+                {accessType === 'citizen' ? 'Código de acceso' : 'Contraseña'}
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  inputMode={accessType === 'citizen' ? 'numeric' : undefined}
+                  value={secret}
+                  onChange={(e) => setSecret(e.target.value)}
+                  placeholder={accessType === 'citizen' ? 'Código de 6 dígitos' : '••••••••'}
                   className="w-full px-4 py-3 rounded-xl text-sm transition-all duration-200 pr-11
                     dark:bg-slate-800/60 dark:border-slate-700/30 dark:text-white dark:placeholder-slate-500
                     bg-white border-slate-200/50 text-slate-900 placeholder-slate-400
@@ -110,25 +136,25 @@ export default function Login() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               )}
-              {loading ? 'Verificando...' : 'Ingresar'}
+              {loading ? 'Verificando...' : accessType === 'citizen' ? 'Validar acceso' : 'Ingresar'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t dark:border-slate-700/30 border-slate-200/50">
             <div className="flex items-center gap-2 mb-3">
               <Shield className="w-4 h-4 dark:text-slate-500 text-slate-400" />
-              <span className="text-xs font-medium dark:text-slate-500 text-slate-400">Credenciales de prueba</span>
+              <span className="text-xs font-medium dark:text-slate-500 text-slate-400">Accesos de demostración</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="dark:bg-slate-800/40 bg-slate-100 rounded-xl p-3">
+                <span className="font-semibold dark:text-slate-300 text-slate-600 block">Ciudadano</span>
+                <span className="dark:text-slate-500 text-slate-400">Cualquier DNI válido</span>
+                <span className="dark:text-slate-500 text-slate-400 block">Código: 123456</span>
+              </div>
               <div className="dark:bg-slate-800/40 bg-slate-100 rounded-xl p-3">
                 <span className="font-semibold dark:text-slate-300 text-slate-600 block">Administrador</span>
                 <span className="dark:text-slate-500 text-slate-400">admin@ayni.pe</span>
                 <span className="dark:text-slate-500 text-slate-400 block">admin123</span>
-              </div>
-              <div className="dark:bg-slate-800/40 bg-slate-100 rounded-xl p-3">
-                <span className="font-semibold dark:text-slate-300 text-slate-600 block">Ciudadano</span>
-                <span className="dark:text-slate-500 text-slate-400">user@ayni.pe</span>
-                <span className="dark:text-slate-500 text-slate-400 block">user123</span>
               </div>
             </div>
           </div>
