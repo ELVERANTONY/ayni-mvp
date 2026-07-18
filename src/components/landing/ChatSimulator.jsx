@@ -1,12 +1,18 @@
 import { useRef, useCallback } from 'react';
 import { useChat } from '@/hooks/useChat';
-import chatService, { WASTE_TYPES, getScenario } from '@/services/chatService';
+import chatService, { WASTE_TYPES } from '@/services/chatService';
 import PhoneFrame from '@/components/citizen/PhoneFrame';
 import ChatPanel from '@/components/citizen/ChatPanel';
+import walletService from '@/services/walletService';
+import adminService from '@/services/adminService';
 
 export default function ChatSimulator() {
   const lockRef = useRef(false);
-  const chat = useChat();
+  const handleApprovedWaste = useCallback(async (waste) => {
+    await walletService.addWasteToWallet(waste.kg, waste.co2, 'approved', waste.label);
+    await adminService.syncAdminMetrics(waste.kg, waste.co2);
+  }, []);
+  const chat = useChat({ onApprovedWaste: handleApprovedWaste });
 
   const handleOption = useCallback(async (optionId) => {
     if (lockRef.current || chat.isSimulating) return;
@@ -28,13 +34,19 @@ export default function ChatSimulator() {
 
         case 'profile':
           await chat.addUserMessage('👤 Mi perfil');
-          await chat.addBotMessages(['👤 *Perfil Demo*\n\nTickets: 25\nAhorro: S/ 15.00']);
+          {
+            const wallet = await walletService.getWallet();
+            await chat.addBotMessages(chatService.buildProfileMessages(wallet).map((m) => m.text));
+          }
           chat.setOptions(chatService.MENU_OPTIONS);
           break;
 
         case 'stats':
-          await chat.addUserMessage('📊 Mis tickets y ahorros');
-          await chat.addBotMessages(['📊 *Estadísticas Demo*\n\nHas reciclado 10 kg de material este mes.']);
+          await chat.addUserMessage('💰 Mi billetera y ahorro');
+          {
+            const wallet = await walletService.getWallet();
+            await chat.addBotMessages(chatService.buildStatsMessages(wallet).map((m) => m.text));
+          }
           chat.setOptions(chatService.MENU_OPTIONS);
           break;
 
@@ -61,7 +73,9 @@ export default function ChatSimulator() {
     await chat.addUserPhoto(waste);
     await chat.addBotMessages(['⏳ Estoy procesando tu imagen...']);
 
-    const scenario = getScenario();
+    // La ruta principal de la demostración es aprobada y reproducible.
+    // Los escenarios de rechazo/duplicado se reservan para explicar controles antifraude.
+    const scenario = 'approved';
 
     if (scenario === 'approved') {
       await chat.runApproved(waste);

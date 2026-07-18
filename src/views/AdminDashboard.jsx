@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const { settings, contributors, monthlyData, exportCSV, applyDiscount, loading } = useAdmin();
 
   useEffect(() => {
-    getSession().then((s) => {
+    getSession('admin').then((s) => {
       if (!s || s.role !== 'admin') {
         navigate('/login');
       } else {

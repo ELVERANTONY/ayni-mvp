@@ -9,7 +9,7 @@ export const WASTE_TYPES = {
 export const MENU_OPTIONS = [
   { id: 'report', label: '📸 Reportar reciclaje' },
   { id: 'profile', label: '👤 Mi perfil' },
-  { id: 'stats', label: '📊 Mis tickets y ahorros' },
+  { id: 'stats', label: '💰 Mi billetera y ahorro' },
   { id: 'benefits', label: '🎁 Beneficios' },
 ];
 
@@ -76,21 +76,21 @@ export function buildDuplicateMessage(waste) {
 
 export function buildProfileMessages(wallet) {
   return [
-    { role: 'bot', type: 'text', text: '👤 **Mi perfil**' },
-    { role: 'bot', type: 'text', text: `ID: AYNI-${String(wallet.id || 48291).padStart(5, '0')}` },
-    { role: 'bot', type: 'text', text: 'Miembro desde: Julio 2026' },
-    { role: 'bot', type: 'text', text: 'Distrito: Municipalidad Demostrativa' },
+    {
+      role: 'bot',
+      type: 'text',
+      text: `👤 Mi perfil\n\n- ID AYNI: AYNI-${String(wallet.id || 48291).padStart(5, '0')}\n- Estado: cuenta activa\n- Miembro desde: Julio 2026\n- Distrito: Municipalidad demostrativa`,
+    },
   ];
 }
 
 export function buildStatsMessages(wallet) {
   return [
-    { role: 'bot', type: 'text', text: '📊 **Tus estadísticas de reciclaje**' },
-    { role: 'bot', type: 'text', text: `♻️ Total reciclado: **${wallet.kg} kg**` },
-    { role: 'bot', type: 'text', text: `🌱 CO₂ eq evitado: **${wallet.co2} kg**` },
-    { role: 'bot', type: 'text', text: `🎟️ Tickets Ayni: **${wallet.tickets}**` },
-    { role: 'bot', type: 'text', text: `💰 Ahorro en arbitrios: **S/ ${wallet.savings}**` },
-    { role: 'bot', type: 'text', text: `📈 Progreso al descuento: **${wallet.progress}%**` },
+    {
+      role: 'bot',
+      type: 'text',
+      text: `📊 Tu billetera AYNI\n\n- ♻️ Reciclado: ${wallet.kg} kg\n- 🌱 CO₂ evitado: ${wallet.co2} kg\n- 🎟️ Tickets Ayni: ${wallet.tickets}\n- 💰 Ahorro estimado: S/ ${wallet.savings}\n- 📈 Progreso al beneficio: ${wallet.progress}%\n\n¡Vas muy bien! Sigue reportando residuos validados para avanzar al siguiente nivel.`,
+    },
   ];
 }
 
@@ -119,21 +119,21 @@ export function buildUserMessage(waste) {
 export function buildClasificadorResponse(waste) {
   return {
     role: 'clasificador', type: 'text',
-    text: `Detectada: ${waste.label} de 1L. Estado: Limpia y aplastada. Colócala en tu Bolsa Verde municipal.`,
+    text: `Material detectado: ${waste.label}. Estado: limpio y apto para reciclaje. Colócalo en tu Bolsa Verde municipal.`,
   };
 }
 
 export function buildImpactoResponse(waste) {
   return {
     role: 'impacto', type: 'text',
-    text: `Has evitado la liberación de ${waste.co2.toFixed(2)} kg de CO₂ eq. Equivalente a mitigar gas metano (CH₄) directo de botaderos informales.`,
+    text: `Impacto estimado: ${waste.co2.toFixed(2)} kg de CO₂ eq evitado. Este registro se suma al impacto ambiental de tu distrito.`,
   };
 }
 
 export function buildAyniResponse(waste) {
   return {
     role: 'ayni', type: 'text',
-    text: `Transacción verificada. Se han sumado ${waste.kg.toFixed(1)} kg a tu meta de arbitrios y has recibido 1 Ticket Ayni para el sorteo de este fin de semana.`,
+    text: `Transacción verificada. Se acreditaron ${waste.kg} kg a tu progreso y recibiste 1 Ticket Ayni.`,
   };
 }
 

@@ -27,7 +27,7 @@ function UserTextMessage({ message }) {
     <div className="flex justify-end animate-slide-left">
       <div className="max-w-[80%] rounded-2xl rounded-br-sm px-3.5 py-2.5 text-sm leading-relaxed shadow-sm break-words
         dark:bg-emerald-600/80 dark:text-white bg-emerald-500 text-white">
-        <span>{message.text}</span>
+        <span className="whitespace-pre-line">{message.text}</span>
         <div className="text-[9px] opacity-60 mt-1 text-right">{formatTime(message.timestamp)}</div>
       </div>
     </div>
@@ -68,7 +68,7 @@ function BotTextMessage({ message }) {
       <div className="max-w-[80%] rounded-2xl rounded-bl-sm px-3.5 py-2.5 text-sm leading-relaxed shadow-sm
         dark:bg-slate-800 dark:text-slate-100 bg-white text-slate-800
         dark:border dark:border-slate-700/30 border border-slate-200/50">
-        <span>{message.text}</span>
+        <span className="whitespace-pre-line">{message.text}</span>
         <div className="text-[9px] dark:text-slate-500 text-slate-400 mt-1">{formatTime(message.timestamp)}</div>
       </div>
     </div>
@@ -135,8 +135,8 @@ function ResultMessage({ message }) {
             </div>
             <div className="dark:bg-slate-700/50 bg-amber-50 rounded-xl p-2.5 text-center">
               <DollarSign className="w-4 h-4 mx-auto mb-1 dark:text-amber-400 text-amber-600" />
-              <span className="text-[10px] font-medium dark:text-slate-400 text-slate-500 block">Ahorro</span>
-              <span className="text-xs font-bold dark:text-white text-slate-900">S/ {(m.kg || 0) * 0.5}</span>
+              <span className="text-[10px] font-medium dark:text-slate-400 text-slate-500 block">Ahorro estimado</span>
+              <span className="text-xs font-bold dark:text-white text-slate-900">S/ {((m.kg || 0) * 0.5).toFixed(2)}</span>
             </div>
           </div>
         </div>

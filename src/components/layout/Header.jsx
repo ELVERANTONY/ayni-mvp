@@ -8,17 +8,18 @@ export default function Header() {
   const location = useLocation();
   const { darkMode, toggleDarkMode } = useTheme();
   const [session, setSession] = useState(null);
+  const currentPath = location.pathname;
+  const expectedRole = currentPath === '/admin' ? 'admin' : 'citizen';
 
   useEffect(() => {
-    getSession().then(setSession);
-  }, [location.pathname]);
+    getSession(expectedRole).then(setSession);
+  }, [expectedRole]);
 
-  const currentPath = location.pathname;
   const role = session?.role;
   const isAdmin = role === 'admin';
 
   const handleLogout = async () => {
-    await logout();
+    await logout(expectedRole);
     window.location.hash = '/';
   };
 

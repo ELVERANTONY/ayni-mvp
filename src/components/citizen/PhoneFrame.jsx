@@ -14,7 +14,7 @@ export default function PhoneFrame({ children }) {
             <p className="text-white font-semibold text-[13px] leading-tight">AYNI Bot</p>
             <p className="text-emerald-200 text-[10px] leading-tight flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 inline-block" />
-              en línea
+              cuenta AYNI vinculada
             </p>
           </div>
         </div>

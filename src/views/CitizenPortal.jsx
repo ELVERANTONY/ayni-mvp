@@ -12,8 +12,8 @@ export default function CitizenPortal() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    getSession().then((s) => {
-      if (!s) {
+    getSession('citizen').then((s) => {
+      if (!s || s.role !== 'citizen') {
         navigate('/login');
       } else {
         setAuthorized(true);

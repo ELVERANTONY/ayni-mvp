@@ -89,8 +89,6 @@ export function useChat({ onApprovedWaste } = {}) {
     setCompletedSteps(new Set());
 
     try {
-      await addAndPersist(chatService.buildUserMessage(waste));
-
       await step('clasificador');
       setIsTyping(true);
       await sleep(TYPING_DELAY * 0.4);
@@ -118,7 +116,7 @@ export function useChat({ onApprovedWaste } = {}) {
       await addAndPersist(chatService.buildResultMessage(waste));
 
       if (onApprovedWaste) {
-        await onApprovedWaste(waste.kg, waste.co2);
+        await onApprovedWaste(waste);
       }
     } finally {
       setIsSimulating(false);
@@ -131,8 +129,6 @@ export function useChat({ onApprovedWaste } = {}) {
     setCompletedSteps(new Set());
 
     try {
-      await addAndPersist(chatService.buildUserMessage(waste));
-
       await step('clasificador');
       setIsTyping(true);
       await sleep(TYPING_DELAY * 0.3);
@@ -156,8 +152,6 @@ export function useChat({ onApprovedWaste } = {}) {
     setCompletedSteps(new Set());
 
     try {
-      await addAndPersist(chatService.buildUserMessage(waste));
-
       await step('clasificador');
       setIsTyping(true);
       await sleep(TYPING_DELAY * 0.3);

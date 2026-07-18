@@ -17,7 +17,7 @@ export async function updateWallet(updates) {
   return db.wallet.get(WALLET_ID);
 }
 
-export async function addWasteToWallet(kgAdd, co2Add, scenario = 'approved') {
+export async function addWasteToWallet(kgAdd, co2Add, scenario = 'approved', wasteType = '') {
   const wallet = await getWallet();
   const newKg = parseFloat((wallet.kg + kgAdd).toFixed(2));
   const newCo2 = parseFloat((wallet.co2 + co2Add).toFixed(3));
@@ -35,7 +35,7 @@ export async function addWasteToWallet(kgAdd, co2Add, scenario = 'approved') {
 
   // Log to wasteLog for admin view
   await db.wasteLog.add({
-    wasteType: '',
+    wasteType,
     kg: kgAdd,
     co2: co2Add,
     scenario,

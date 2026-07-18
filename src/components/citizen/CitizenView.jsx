@@ -1,15 +1,18 @@
+import { useEffect, useState } from 'react';
 import { useWallet } from '@/hooks/useWallet';
+import adminService from '@/services/adminService';
 import AyniWallet from './AyniWallet';
 import { User, Award, History, ArrowRight, Leaf, Shield, CheckCircle } from 'lucide-react';
 
 export default function CitizenView() {
   const { wallet, displayKg, displayCo2, displaySavings } = useWallet();
+  const [recentActivity, setRecentActivity] = useState([]);
 
-  const mockHistory = [
-    { id: 1, date: 'Hoy, 10:30 AM', action: 'Reciclaje PET (1.2 kg)', tickets: '+12' },
-    { id: 2, date: 'Ayer, 15:45 PM', action: 'Reciclaje Cartón (3.5 kg)', tickets: '+35' },
-    { id: 3, date: '12 May, 09:15 AM', action: 'Reciclaje Aluminio (0.8 kg)', tickets: '+8' },
-  ];
+  useEffect(() => {
+    adminService.getWasteLogs().then((logs) => {
+      setRecentActivity(logs.slice(0, 5));
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-12">
@@ -48,7 +51,7 @@ export default function CitizenView() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">Mi Perfil</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">ID: AYNI-41198</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">ID: AYNI-{String(wallet.id || 1).padStart(5, '0')}</p>
                 </div>
               </div>
               
@@ -130,14 +133,20 @@ export default function CitizenView() {
           </div>
           
           <div className="space-y-3">
-            {mockHistory.map((item) => (
+            {recentActivity.length === 0 ? (
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl text-sm text-slate-500 dark:text-slate-400">
+                Aún no tienes reportes aprobados. Envía tu primer residuo desde AYNI Bot.
+              </div>
+            ) : recentActivity.map((item) => (
               <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer">
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white">{item.action}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{item.date}</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">Reciclaje {item.wasteType || 'validado'} ({item.kg} kg)</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {new Date(item.timestamp).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' })} · {item.co2} kg CO₂ eq evitado
+                  </p>
                 </div>
                 <div className="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-xl font-bold text-sm border border-amber-200 dark:border-amber-800/50">
-                  {item.tickets} Tickets
+                  +1 Ticket
                 </div>
               </div>
             ))}

@@ -1,14 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ClipboardList, CheckCircle, XCircle, Search, UserPlus, Filter } from 'lucide-react';
 import GlassCard from '@/components/common/GlassCard';
-
-const MOCK_REQUESTS = [
-  { id: 1, name: 'Roberto Quispe', dni: '72458123', email: 'rquispe@gmail.com', date: Date.now() - 60000, status: 'pending' },
-  { id: 2, name: 'Lucía Fernández', dni: '71829345', email: 'lfernandez@hotmail.com', date: Date.now() - 120000, status: 'pending' },
-  { id: 3, name: 'Miguel Ángel Torres', dni: '73567182', email: 'mtorres@outlook.com', date: Date.now() - 300000, status: 'pending' },
-  { id: 4, name: 'Carmen Ríos', dni: '70123456', email: 'crios@yahoo.com', date: Date.now() - 600000, status: 'approved' },
-  { id: 5, name: 'José Luis García', dni: '74839201', email: 'jlgarcia@gmail.com', date: Date.now() - 900000, status: 'rejected' },
-];
+import adminService from '@/services/adminService';
 
 function formatDateTime(ts) {
   const d = new Date(ts);
@@ -18,21 +11,35 @@ function formatDateTime(ts) {
 }
 
 export default function AdminRegistrations() {
-  const [requests, setRequests] = useState(MOCK_REQUESTS);
+  const [requests, setRequests] = useState([]);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
 
+  const loadRequests = useCallback(async () => {
+    const latest = await adminService.getRegistrationRequests();
+    setRequests(latest);
+  }, []);
+
+  useEffect(() => {
+    loadRequests();
+    const interval = window.setInterval(loadRequests, 1500);
+    return () => window.clearInterval(interval);
+  }, [loadRequests]);
+
   const filtered = requests.filter((r) => {
-    const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) || r.dni.includes(search);
+    const document = r.document || r.dni || '';
+    const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) || document.includes(search);
     const matchFilter = filter === 'all' || r.status === filter;
     return matchSearch && matchFilter;
   });
 
-  const handleApprove = (id) => {
+  const handleApprove = async (id) => {
+    await adminService.approveRegistrationRequest(id);
     setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: 'approved' } : r));
   };
 
-  const handleReject = (id) => {
+  const handleReject = async (id) => {
+    await adminService.rejectRegistrationRequest(id);
     setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: 'rejected' } : r));
   };
 
@@ -84,7 +91,7 @@ export default function AdminRegistrations() {
             <tr className="dark:bg-slate-800/40 bg-slate-100/60 dark:text-slate-400 text-slate-500">
               <th className="text-left font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Solicitante</th>
               <th className="text-left font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">DNI</th>
-              <th className="text-left font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Correo</th>
+              <th className="text-left font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Canal de contacto</th>
               <th className="text-left font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Fecha</th>
               <th className="text-center font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Estado</th>
               <th className="text-center font-semibold text-[11px] uppercase tracking-wider px-6 py-3.5">Acción</th>
@@ -112,17 +119,17 @@ export default function AdminRegistrations() {
                       <div className="w-8 h-8 rounded-full dark:bg-ayni-900/30 bg-ayni-50 flex items-center justify-center">
                         <UserPlus className="w-4 h-4 dark:text-ayni-400 text-ayni-600" />
                       </div>
-                      <span className="font-semibold dark:text-slate-200 text-slate-800">{req.name}</span>
+                        <span className="font-semibold dark:text-slate-200 text-slate-800">{req.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-3.5">
-                    <span className="text-xs font-mono dark:text-slate-400 text-slate-500">{req.dni}</span>
+                    <span className="text-xs font-mono dark:text-slate-400 text-slate-500">{req.document || req.dni || '—'}</span>
                   </td>
                   <td className="px-6 py-3.5">
-                    <span className="text-xs dark:text-slate-400 text-slate-500">{req.email}</span>
+                    <span className="text-xs dark:text-slate-400 text-slate-500">{req.phone || req.email || '—'}</span>
                   </td>
                   <td className="px-6 py-3.5">
-                    <span className="text-xs font-mono dark:text-slate-400 text-slate-500">{formatDateTime(req.date)}</span>
+                        <span className="text-xs font-mono dark:text-slate-400 text-slate-500">{formatDateTime(req.timestamp || req.date)}</span>
                   </td>
                   <td className="px-6 py-3.5 text-center">
                     {req.status === 'approved' ? (

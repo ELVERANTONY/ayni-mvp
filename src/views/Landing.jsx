@@ -22,7 +22,9 @@ export default function Landing() {
   const navigate = useNavigate();
   const [showRegister, setShowRegister] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [formData, setFormData] = useState({ name: '', document: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', document: '', propertyCode: '', phone: '', consent: false });
+  const [requestId, setRequestId] = useState(null);
+  const [registrationError, setRegistrationError] = useState(null);
 
   // Forzar modo claro siempre en la Landing
   useEffect(() => {
@@ -31,16 +33,18 @@ export default function Landing() {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setRegistrationError(null);
     try {
-      await db.registrationRequests.add({
+      const id = await db.registrationRequests.add({
         ...formData,
         status: 'pending',
         timestamp: Date.now(),
       });
+      setRequestId(id);
       setIsSubmitted(true);
     } catch (error) {
       console.error('Error al registrar', error);
-      setIsSubmitted(true);
+      setRegistrationError('No pudimos registrar la solicitud. Intenta nuevamente.');
     }
   };
 
@@ -191,7 +195,10 @@ export default function Landing() {
                 </div>
                 <h3 className="text-xl font-extrabold text-slate-900 mb-2">¡Solicitud enviada!</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  La municipalidad revisará tu perfil. Recibirás tus credenciales directamente en tu WhatsApp.
+                  Tu solicitud quedó en validación municipal. Al aprobarse, AYNI vinculará este celular con tu bot oficial.
+                </p>
+                <p className="mt-3 text-xs font-mono text-ayni-700 bg-ayni-50 rounded-lg py-2 px-3">
+                  Código de seguimiento: AYNI-REG-{String(requestId || 0).padStart(5, '0')}
                 </p>
                 <button
                   onClick={() => { setShowRegister(false); setIsSubmitted(false); }}
@@ -208,6 +215,7 @@ export default function Landing() {
                   </div>
                   <h3 className="text-xl font-extrabold text-slate-900">Únete a AYNI</h3>
                   <p className="text-sm text-slate-500 mt-1">Inicia tu camino hacia un distrito más limpio.</p>
+                  <p className="text-xs text-slate-400 mt-2">Registro seguro para validación de elegibilidad municipal.</p>
                 </div>
                 <form onSubmit={handleRegisterSubmit} className="space-y-4">
                   <div>
@@ -243,6 +251,32 @@ export default function Landing() {
                       placeholder="+51 987 654 321"
                     />
                   </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Código predial</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.propertyCode}
+                      onChange={e => setFormData({...formData, propertyCode: e.target.value})}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm outline-none focus:border-ayni-500 focus:bg-white transition-colors"
+                      placeholder="Ej. 45892-A"
+                    />
+                  </div>
+                  <label className="flex items-start gap-2.5 text-xs text-slate-600 leading-relaxed cursor-pointer">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={formData.consent}
+                      onChange={e => setFormData({...formData, consent: e.target.checked})}
+                      className="mt-0.5 accent-emerald-600"
+                    />
+                    <span>Acepto el tratamiento de mis datos para la validación del programa AYNI.</span>
+                  </label>
+                  {registrationError && (
+                    <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                      {registrationError}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     className="w-full py-3 bg-ayni-500 text-white rounded-xl font-bold text-sm hover:bg-ayni-600 transition-colors mt-2 shadow-md shadow-ayni-500/20 active:scale-[0.98]"

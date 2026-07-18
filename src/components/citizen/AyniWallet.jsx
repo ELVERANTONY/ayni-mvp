@@ -13,7 +13,7 @@ export default function AyniWallet({ wallet, displayKg, displayCo2, displaySavin
           Billetera Ayni
         </span>
         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full dark:bg-slate-800 dark:text-slate-400 bg-slate-200 text-slate-500">
-          ID: AYNI-{Math.floor(10000 + Math.random() * 90000)}
+          ID: AYNI-{String(wallet.id || 1).padStart(5, '0')}
         </span>
       </div>
 
